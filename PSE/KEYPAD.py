@@ -1,40 +1,101 @@
 import RPi.GPIO as GPIO
+import char_lcd as LCD
+import RFIDread as RFID
 
+#initialize lcd
+lcd = LCD.init()
+lcd.message('     Welcome')
 
-GPIO.setmode(GPIO.BCM) 
-MATRIX = [
-      [1,2,3,'A'],
-      [4,5,6,'B'],
-      [7,8,9,'C'],
-      ['*',0,'#','D']
-    ]
+def show_message(message):
+    lcd.clear()
+    lcd.message(message)
 
-# COL = [17, 15,14,4]
-# ROW = [5, 3, 27, 20]
+def matrix_data():
+    matrix = [
+          [1,2,3,'A'],
+          [4,5,6,'B'],
+          [7,8,9,'C'],
+          ['*',0,'#','D']
+        ]
+    return matrix
 
-ROW = [5,6,13,19]
-COL = [7, 1, 12, 16]
+def row_data():
+    row = [5,6,13,19]
+    return row
 
-for j in range(4):
-    GPIO.setup(COL[j], GPIO.OUT)
-    GPIO.output(COL[j], 1)
+def col_data():
+    col = [7, 1, 12, 16]
+    return col
 
-for i in range(4):
-    GPIO.setup(ROW[i],GPIO.IN, pull_up_down = GPIO.PUD_UP)
+def keypad_init():
+    ROW = row_data()
+    COL = col_data()
+    
+    GPIO.setmode(GPIO.BCM) 
 
+    for j in range(4):
+        GPIO.setup(COL[j], GPIO.OUT)
+        GPIO.output(COL[j], 1)
 
-try:
-    while True:
-        for j in range(4):
-            GPIO.output(COL[j],0)
-                
-            for i in range(4):
-                if(GPIO.input(ROW[i])) == 0:
-                    print (MATRIX[i][j])
-                    while(GPIO.input(ROW[i]) == 0):
-                        pass
+    for i in range(4):
+        GPIO.setup(ROW[i],GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-            GPIO.output(COL[j],1)
+def limit_input(limit):
+    keypad_init()
+    matrix = matrix_data()
+    row = row_data()
+    col = col_data()
+    
+    password = []
+    message = 'pass :'
+    
+    try:
+        while limit != 0:
+            for j in range(4):
+                GPIO.output(col[j],0)
+                    
+                for i in range(4):
+                    if(GPIO.input(row[i])) == 0:
+                        pin = matrix[i][j]
+                        if pin == 'D':
+                            show_message('    RFID MODE')
+                            user = RFID.read()
+                            return user
+                        password.append(pin)
+                        limit -= 1
+                        message += '*'
+                        show_message(message)
+#                         print ('Password :' + str(password))
+#                         print ('limit    :' + str(limit))
+                        while(GPIO.input(row[i]) == 0):
+                            pass
 
-except KeyboardInterrupt:
-    GPIO.cleanup()
+                GPIO.output(col[j],1)
+
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+    
+    return password
+
+def main():
+    keypad_init()
+    matrix = matrix_data()
+    col = col_data()
+    row = row_data()
+    try:
+        while True:
+            for j in range(4):
+                GPIO.output(col[j],0)
+                    
+                for i in range(4):
+                    if(GPIO.input(row[i])) == 0:
+                        print (matrix[i][j])
+                        while(GPIO.input(row[i]) == 0):
+                            pass
+
+                GPIO.output(col[j],1)
+
+    except KeyboardInterrupt:
+        GPIO.cleanup()        
+
+print(limit_input(5))

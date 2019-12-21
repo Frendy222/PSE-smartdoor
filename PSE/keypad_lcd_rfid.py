@@ -3,6 +3,9 @@ import char_lcd as LCD
 import time
 from mfrc522 import SimpleMFRC522
 
+reader = SimpleMFRC522()
+# print('this is RFID')
+
 def rfid_read():
     try:
         id, text = reader.read()
@@ -11,14 +14,22 @@ def rfid_read():
         
     finally:
         GPIO.cleanup()
+        
+def rfid_write():
+    try:
+        text = input('New Data:')
+        print("now place your tag to write")
+        reader.write(text)
+        print("written")
+    finally:
+        GPIO.cleanup()
+
 
 #variable
 cur = []
 attempt = 0
 message = '     Welcome'
 
-#setup RFID for reading
-reader = SimpleMFRC522()
 
 #set up keypad
 GPIO.setmode(GPIO.BCM) 
@@ -58,12 +69,12 @@ try:
                     
                     #input data only 8 digit
                     input = MATRIX[i][j]
+                    
                     if input == 'D':
-                        message = 'Please tap your \n RFID card'
-                        lcd.clear()
-                        lcd.message(message)
                         rfid_read()
-                        
+                        lcd.clear()
+                        message = 'place your RFID'
+                        lcd.message(message)
                     if len(cur) < 8:
                         cur.append(input)
                         print (cur)
@@ -101,4 +112,3 @@ try:
 
 except KeyboardInterrupt:
     GPIO.cleanup()
-

@@ -1,19 +1,21 @@
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
+import time
 
-reader = SimpleMFRC522()
-print('this is RFID')
-
-def rfid_read():
+def read():
+    print ('rfid mode')
+    reader = SimpleMFRC522()
     try:
         id, text = reader.read()
-        print(id)
-        print(text)
+        print('id   :' + str(id))
+        print('User :' + text)
         
     finally:
         GPIO.cleanup()
-        
-def rfid_write():
+    return text
+    
+def write():
+    reader = SimpleMFRC522()
     try:
         text = input('New Data:')
         print("now place your tag to write")
@@ -22,5 +24,3 @@ def rfid_write():
     finally:
         GPIO.cleanup()
 
-rfid_read()
-    
