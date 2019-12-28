@@ -24,3 +24,5 @@ def write():
     finally:
         GPIO.cleanup()
 
+# write()
+# read()

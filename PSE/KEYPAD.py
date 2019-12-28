@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import char_lcd as LCD
 import RFIDread as RFID
+import relay_solenoid as RELAY
 
 #initialize lcd
 lcd = LCD.init()
@@ -60,6 +61,7 @@ def limit_input(limit):
                         if pin == 'D':
                             show_message('    RFID MODE')
                             user = RFID.read()
+                            RELAY.check(user)
                             return user
                         password.append(pin)
                         limit -= 1
@@ -97,5 +99,6 @@ def main():
 
     except KeyboardInterrupt:
         GPIO.cleanup()        
-
 print(limit_input(5))
+# RFID.read()
+# RFID.write()
