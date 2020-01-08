@@ -1,7 +1,4 @@
-#!/usr/bin/python
-# Example using a character LCD connected to a Raspberry Pi or BeagleBone Black.
 import time
-
 import Adafruit_CharLCD as LCD
 import adafruit_character_lcd.character_lcd as characterlcd
 
@@ -29,6 +26,8 @@ def init():
 # 
 # # Print a two line message
 # lcd.message('Hello\nworld!')
+
+
 # 
 # 
 # # Wait 5 seconds
